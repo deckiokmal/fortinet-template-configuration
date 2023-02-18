@@ -4,17 +4,17 @@ L1nt4s4rt@_SSA!
 config system interface
     edit "MAIN"
         set vdom "root"
-        set ip 192.168.111.38 255.255.255.0
+        set ip 192.168.33.8 255.255.255.0
         set allowaccess ping ssh https
         set interface "wan1"
-        set vlanid 111
+        set vlanid 333
     next
     edit "BACKUP"
         set vdom "root"
-        set ip 192.168.222.38 255.255.255.0
+        set ip 192.168.44.8 255.255.255.0
         set allowaccess ping ssh https
         set interface "wan1"
-        set vlanid 222
+        set vlanid 444
     next
     edit "wan1"
         set vdom "root"
@@ -35,21 +35,21 @@ config system sdwan
     config members
         edit 3
             set interface "MAIN"
-            set gateway 192.168.111.254
-            set source 10.203.48.44
+            set gateway 192.168.33.254
+            set source 10.203.48.8
             set zone "FAILOVER-ZONE"
         next
         edit 4
             set interface "BACKUP"
-            set gateway 192.168.222.254
-            set source 10.203.48.44
+            set gateway 192.168.44.254
+            set source 10.203.48.8
             set cost 1
             set zone "FAILOVER-ZONE"
         next
     end
     config health-check
         edit "PEP"
-            set server "10.203.0.1"
+            set server "10.203.0.2"
             set members 0
             config sla
                 edit 1
@@ -78,24 +78,23 @@ end
 
 config router bgp
     set as 65000
-    set router-id 10.203.48.44
+    set router-id 10.203.48.8
     set ibgp-multipath enable
     config neighbor
-        edit "192.168.111.254"
+        edit "192.168.33.254"
             set description "MAIN"
             set link-down-failover enable
             set soft-reconfiguration enable
             set remote-as 65000
             set connect-timer 1
         next
-        edit "192.168.222.254"
+        edit "192.168.44.254"
             set description "BACKUP"
             set link-down-failover enable
             set soft-reconfiguration enable
             set remote-as 65000
             set connect-timer 1
         next
-        delete 1.11.16.254
     end
 end
 
@@ -111,7 +110,7 @@ config firewall policy
     edit 1
         set name "TRAFFIC-OUT"
         set srcintf "Loopback0" "lan" "LAN-OTHER"
-        set dstintf "FAILOVER-ZONE"
+        set dstintf "FAILOVER-ZONE" "wan1"
         set srcaddr "all"
         set dstaddr "all"
         set action accept
@@ -121,7 +120,7 @@ config firewall policy
     next
     edit 2
         set name "TRAFFIC-IN"
-        set srcintf "FAILOVER-ZONE"
+        set srcintf "FAILOVER-ZONE" "wan1"
         set dstintf "Loopback0" "lan" "LAN-OTHER"
         set srcaddr "all"
         set dstaddr "all"
