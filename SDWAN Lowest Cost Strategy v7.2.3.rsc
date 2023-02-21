@@ -4,14 +4,14 @@ L1nt4s4rt@_SSA!
 config system interface
     edit "MAIN"
         set vdom "root"
-        set ip 192.168.33.8 255.255.255.0
+        set ip 192.168.33.2 255.255.255.0
         set allowaccess ping ssh https
         set interface "wan1"
         set vlanid 333
     next
     edit "BACKUP"
         set vdom "root"
-        set ip 192.168.44.8 255.255.255.0
+        set ip 192.168.44.2 255.255.255.0
         set allowaccess ping ssh https
         set interface "wan1"
         set vlanid 444
@@ -22,7 +22,7 @@ config system interface
         set allowaccess ping https ssh snmp
         set type physical
         set lldp-reception enable
-        set role wan
+        set role wan1
     next
 end
 
@@ -36,13 +36,13 @@ config system sdwan
         edit 3
             set interface "MAIN"
             set gateway 192.168.33.254
-            set source 10.203.48.8
+            set source 10.203.48.25
             set zone "FAILOVER-ZONE"
         next
         edit 4
             set interface "BACKUP"
             set gateway 192.168.44.254
-            set source 10.203.48.8
+            set source 10.203.48.25
             set cost 1
             set zone "FAILOVER-ZONE"
         next
@@ -78,7 +78,7 @@ end
 
 config router bgp
     set as 65000
-    set router-id 10.203.48.8
+    set router-id 10.203.48.25
     set ibgp-multipath enable
     config neighbor
         edit "192.168.33.254"
