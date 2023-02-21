@@ -88,6 +88,7 @@ config system sdwan
             set interface "T-BACKUP"
             set source 192.168.1.1
             set gateway 10.254.1.1
+            set cost 1
         next
     end
 end
@@ -96,9 +97,14 @@ config system sdwan
     config health-check
         edit "datacenter1"
             set server "10.200.1.1"
-            set interval 1
-            set failtime 2
-            set recoverytime 10
+            set members 0
+            config sla
+                edit 1
+                    set latency-threshold 50
+                    set jitter-threshold 50
+                    set packetloss-threshold 1
+                next
+            end
         next
     end
 end
@@ -106,9 +112,15 @@ end
 config system sdwan
     config service
         edit 1
-            set mode priority
-            set dst n-corporate
-            set health-check "datacenter1"
+            set name "FAILOVER-STRATEGY"
+            set mode sla
+            set dst "all"
+            set src "all"
+            config sla
+                edit "datacenter1"
+                    set id 1
+                next
+            end
             set priority-members 1 2
         next
     end
