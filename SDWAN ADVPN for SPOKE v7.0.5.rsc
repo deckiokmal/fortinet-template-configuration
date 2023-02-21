@@ -60,17 +60,17 @@ config system interface
 end
 
 config router bgp
-    set as 65500
+    set as 64888
     set router-id 10.254.0.2
     set ibgp-multipath enable
     config neighbor
         edit "10.254.0.1"
             set soft-reconfiguration enable
-            set remote-as 65500
+            set remote-as 64888
         next
         edit "10.254.1.1"
             set soft-reconfiguration enable
-            set remote-as 65500
+            set remote-as 64888
         next
     end
 end
