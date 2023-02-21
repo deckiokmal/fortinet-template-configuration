@@ -4,7 +4,7 @@
 config vpn ipsec phase1-interface
     edit "T-MAIN"
         set type dynamic
-        set interface "port2"
+        set interface "VPN-BPD-JAMBI"
         set peertype any
         set exchange-interface-ip enable
         set proposal aes256-sha256
@@ -15,7 +15,7 @@ config vpn ipsec phase1-interface
     next
     edit "T-BACKUP"
         set type dynamic
-        set interface "port3"
+        set interface "port2"
         set peertype any
         set exchange-interface-ip enable
         set proposal aes256-sha256
@@ -44,26 +44,24 @@ end
 3. ROUTING
 config system interface
     edit "T-MAIN"
-        set vdom "root"
         set ip 10.254.0.1 255.255.255.255
         set allowaccess ping
         set type tunnel
         set remote-ip 10.254.0.254 255.255.255.0
-        set interface "port2"
+        set interface "VPN-BPD-JAMBI"
     next
     edit "T-BACKUP"
-        set vdom "root"
         set ip 10.254.1.1 255.255.255.255
         set allowaccess ping
         set type tunnel
         set remote-ip 10.254.1.254 255.255.255.0
-        set interface "port3"
+        set interface "port2"
     next
 end
 
 config system interface
     edit "loopback_0"
-        set vdom "root"
+        set vdom BPD-JAMBI
         set ip 10.255.255.1 255.255.255.255
         set allowaccess ping
         set type loopback
@@ -71,30 +69,34 @@ config system interface
 end
 
 config router bgp
-    set as 65500
-    set router-id 10.10.0.1
-    set ebgp-multipath enable
+    set as 64888
+    set router-id 1.11.8.38
+    set ibgp-multipath enable
     set graceful-restart enable
     config neighbor-group
-        edit "branch-peers-1"
+        edit "T-MAIN-peer"
             set soft-reconfiguration enable
-            set remote-as 65501
+            set link-down-failover enable
+            set next-hop-self enable
+            set remote-as 64888
             set route-reflector-client enable
         next
-        edit "branch-peers-2"
+        edit "T-BACKUP-peer"
             set soft-reconfiguration enable
-            set remote-as 65501
+            set link-down-failover enable
+            set next-hop-self enable
+            set remote-as 64888
             set route-reflector-client enable
         next
     end
     config neighbor-range
         edit 1
             set prefix 10.254.0.0 255.255.255.0
-            set neighbor-group "branch-peers-1"
+            set neighbor-group "T-MAIN-peer"
         next
         edit 2
             set prefix 10.254.1.0 255.255.255.0
-            set neighbor-group "branch-peers-2"
+            set neighbor-group "T-BACKUP-peer"
         next
     end
     config network
@@ -131,24 +133,3 @@ config router static
         set blackhole enable
     next
 end
-
-
-Validation
-The following commands can be used to validate the connections on the datacenter and branches.
-
-Datacenter
-Routing table:
-# get router info routing-table all
-VPN establishment:
-# diagnose vpn ike gateway list
-Branch
-SD-WAN validation:
-# diagnose sys sdwan member
-# diagnose sys sdwan service
-# diagnose sys sdwan health-check
-Routing table:
-# get router info routing-table all
-# get router info route-map-address
-# get router info bgp route-map <route-map-name>
-VPN establishment:
-# diagnose vpn ike gateway list

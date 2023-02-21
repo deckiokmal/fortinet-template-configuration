@@ -60,9 +60,9 @@ config system interface
 end
 
 config router bgp
-    set as 65501
+    set as 65500
     set router-id 10.254.0.2
-    set ebgp-multipath enable
+    set ibgp-multipath enable
     config neighbor
         edit "10.254.0.1"
             set soft-reconfiguration enable
