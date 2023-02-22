@@ -4,17 +4,17 @@ L1nt4s4rt@_SSA!
 config system interface
     edit "MAIN"
         set vdom "root"
-        set ip 192.168.33.2 255.255.255.0
+        set ip 192.168.111.27 255.255.255.0
         set allowaccess ping ssh https
         set interface "wan1"
-        set vlanid 333
+        set vlanid 111
     next
     edit "BACKUP"
         set vdom "root"
-        set ip 192.168.44.2 255.255.255.0
+        set ip 192.168.222.27 255.255.255.0
         set allowaccess ping ssh https
         set interface "wan1"
-        set vlanid 444
+        set vlanid 222
     next
     edit "wan1"
         set vdom "root"
@@ -35,14 +35,14 @@ config system sdwan
     config members
         edit 3
             set interface "MAIN"
-            set gateway 192.168.33.254
-            set source 10.203.48.25
+            set gateway 192.168.111.254
+            set source 10.203.48.33
             set zone "FAILOVER-ZONE"
         next
         edit 4
             set interface "BACKUP"
-            set gateway 192.168.44.254
-            set source 10.203.48.25
+            set gateway 192.168.222.254
+            set source 10.203.48.33
             set cost 1
             set zone "FAILOVER-ZONE"
         next
@@ -78,17 +78,17 @@ end
 
 config router bgp
     set as 65000
-    set router-id 10.203.48.25
+    set router-id 10.203.48.33
     set ibgp-multipath enable
     config neighbor
-        edit "192.168.33.254"
+        edit "192.168.111.254"
             set description "MAIN"
             set link-down-failover enable
             set soft-reconfiguration enable
             set remote-as 65000
             set connect-timer 1
         next
-        edit "192.168.44.254"
+        edit "192.168.222.254"
             set description "BACKUP"
             set link-down-failover enable
             set soft-reconfiguration enable
